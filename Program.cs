@@ -95,7 +95,9 @@ class Program
         await File.WriteAllTextAsync(file_concurrent_ticket, result_concurrent_ticket);
 
         Console.WriteLine("==========================================================================================");
-        Console.WriteLine($"Results were written to Temp directory and folder will be openned once logging completed.");
+        Console.WriteLine($"Results were written to Temp directory.");
+        Console.WriteLine($"For Windows OS, the folder will be openned once logging completed.");
+        Console.WriteLine($"For Linux OS, please find the log files in path /tmp/AzureMySQLPerfCheckerResults.");
 
         // Open folder once completed (in WinOS)
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
