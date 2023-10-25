@@ -27,6 +27,30 @@ dotnet build
 sudo dotnet run
 ```
 
+**Windows** <br>
+Paste the following in a Powershell console in Windows:
+```powershell
+$ProgressPreference = "SilentlyContinue";
+$scriptFile = '/AzureMySQLPerfChecker.ps1'
+$scriptUrlBase = 'https://raw.githubusercontent.com/ShawnXxy/AzMySQL-Perf-Checker/master'
+cls
+Write-Host 'Trying to download the script file from GitHub (https://github.com/ShawnXxy/AzMySQL-Perf-Checker), please wait...'
+Write-Host "Source file address:" $scriptUrlBase$scriptFile
+try {
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls
+    [System.Reflection.Assembly]::LoadWithPartialName("MySql.Data")
+    Invoke-Expression (Invoke-WebRequest -Uri ($scriptUrlBase + $scriptFile) -UseBasicParsing).Content
+    }
+catch {
+    Write-Host 'ERROR: The script file could not be downloaded or the script execution failed:' -ForegroundColor Red
+    $_.Exception
+    Write-Host 'Confirm this machine can access https://github.com/ShawnXxy/AzMySQL-Perf-Checker/' -ForegroundColor Yellow
+    Write-Host 'or use a machine with Internet access to see how to run this from machines without Internet. See how at https://github.com/ShawnXxy/AzMySQL-Perf-Checker/' -ForegroundColor Yellow
+    Write-Host 'or raise your issue at https://github.com/ShawnXxy/AzMySQL-Perf-Checker/issues if the script execution fails..' -ForegroundColor Yellow
+}
+#end of script
+```
+
 ## Limitation
 Currently, only supports MySQL 5.7 as some dictionay table changed in MySQL 8.0
 
