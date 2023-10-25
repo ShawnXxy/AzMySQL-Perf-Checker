@@ -1,4 +1,4 @@
-﻿[System.Reflection.Assembly]::LoadWithPartialName("MySql.Data")
+﻿# [System.Reflection.Assembly]::LoadWithPartialName("MySql.Data")
   
 $RepositoryBranch = 'master'
 
@@ -94,7 +94,7 @@ try {
         }
 
         # Create folder in Temp directory and subfolder named based on UTC timestamp
-        $folderPath = Join-Path $env:TEMP (logsFolderName + "\" + (Get-Date -Format "yyyyMMddHHmmss"))  
+        $folderPath = Join-Path $env:TEMP ($logsFolderName + "\" + (Get-Date -Format "yyyyMMddHHmmss"))  
         New-Item -ItemType Directory -Force -Path $folderPath  
 
         $MySQLDllPath = Join-Path ((Get-Location).Path) "MySql.Data.dll"
@@ -141,9 +141,7 @@ try {
         $result_current_wait | Export-Csv -Path $file_current_wait -NoTypeInformation  
     
         
-        if ([System.Environment]::OSVersion.Platform -eq "Win32NT") {  
-            Start-Process $folderPath  
-        }  
+        
         
     }
     catch {
@@ -160,7 +158,14 @@ finally {
             $destAllFiles = (Get-Location).Path + '/AllFiles.zip'
             Compress-Archive -Path ((Get-Location).Path + '/*.csv'), ((Get-Location).Path + '/*.log') -DestinationPath $destAllFiles -Force
             Write-Host 'A zip file with all the files can be found at' $destAllFiles -ForegroundColor Green
+
+              
         }
+
+        # if ([System.Environment]::OSVersion.Platform -eq "Win32NT") {  
+        #     Start-Process $folderPath  
+        # }
+
         if ($PSVersionTable.Platform -eq 'Unix') {
             
             Get-ChildItem
