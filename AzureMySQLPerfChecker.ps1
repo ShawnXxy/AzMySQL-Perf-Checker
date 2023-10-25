@@ -1,8 +1,4 @@
-﻿using namespace System
-using namespace Microsoft.Azure.PowerShell.Cmdlets.MySql
-using namespace MySql.Data.MySqlClient
-
-
+﻿
 $RepositoryBranch = 'master'
 
 $CustomerRunningInElevatedMode = $false
