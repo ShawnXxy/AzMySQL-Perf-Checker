@@ -27,6 +27,7 @@ class Program
         // Perf Query to be run
         string query_processlist = "SHOW FULL PROCESSLIST;";
         string query_innodb_status = "SHOW ENGINE INNODB STATUS;";
+        // innodb_lock_waits only exists in MySQL 5.7
         string query_blocks = "SELECT r.trx_mysql_thread_id waiting_thread, r.trx_query waiting_query, concat(timestampdiff(SECOND, r.trx_wait_started, CURRENT_TIMESTAMP()), 's') AS duration, b.trx_mysql_thread_id blocking_thread, t.processlist_command state, b.trx_query blocking_current_query, e.sql_text blocking_last_query FROM information_schema.innodb_lock_waits w JOIN information_schema.innodb_trx b ON b.trx_id = w.blocking_trx_id JOIN information_schema.innodb_trx r ON r.trx_id = w.requesting_trx_id JOIN performance_schema.threads t on t.processlist_id = b.trx_mysql_thread_id JOIN performance_schema.events_statements_current e USING(thread_id); ";
         string query_mdl = "SELECT OBJECT_TYPE, OBJECT_SCHEMA, OBJECT_NAME, LOCK_TYPE, LOCK_STATUS, THREAD_ID, PROCESSLIST_ID, PROCESSLIST_INFO FROM performance_schema.metadata_locks INNER JOIN performance_schema.threads ON THREAD_ID = OWNER_THREAD_ID WHERE PROCESSLIST_ID<> CONNECTION_ID(); ";
         string query_concurrent_ticket = "SELECT OBJECT_TYPE, OBJECT_SCHEMA, OBJECT_NAME, LOCK_TYPE, LOCK_STATUS, THREAD_ID, PROCESSLIST_ID, PROCESSLIST_INFO FROM performance_schema.metadata_locks INNER JOIN performance_schema.threads ON THREAD_ID = OWNER_THREAD_ID WHERE PROCESSLIST_ID<> CONNECTION_ID(); ";
