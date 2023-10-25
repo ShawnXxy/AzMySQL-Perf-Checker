@@ -4,13 +4,6 @@
 #FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 #WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using namespace System
-using namespace System.Net
-using namespace System.net.Sockets
-using namespace System.Collections.Generic
-using namespace System.Diagnostics
-using namespace Microsoft.Azure.PowerShell.Cmdlets.MySql
-using namespace MySql.Data.MySqlClient
 
 $RepositoryBranch = 'master'
 
@@ -27,7 +20,7 @@ else {
     }
 }
 
-function Execute-MySQLQuery {  
+function MySQLPerfChecker {  
     param(  
         [string]$mysqlHost,  
         [System.Management.Automation.PSCredential]$credential,  
@@ -127,13 +120,12 @@ try {
     }
 
     try {
-        $result_processlist = Execute-MySQLQuery -mysqlHost $mysqlHost -credential $credential -query $query_processlist  
-        $result_innodb_status = Execute-MySQLQuery -mysqlHost $mysqlHost -credential $credential -query $query_innodb_status  
-        $result_blocks = Execute-MySQLQuery -mysqlHost $mysqlHost -credential $credential -query $query_blocks  
-        $result_mdl = Execute-MySQLQuery -mysqlHost $mysqlHost -credential $credential -query $query_mdl  
-        $result_concurrent_ticket = Execute-MySQLQuery -mysqlHost $mysqlHost -credential $credential -query $query_concurrent_ticket  
-        $result_current_wait = Execute-MySQLQuery -mysqlHost $mysqlHost -credential $credential -query $query_current_wait  
-    
+        $result_processlist = MySQLPerfChecker -mysqlHost $mysqlHost -credential $credential -query $query_processlist  
+        $result_innodb_status = MySQLPerfChecker -mysqlHost $mysqlHost -credential $credential -query $query_innodb_status  
+        $result_blocks = MySQLPerfChecker -mysqlHost $mysqlHost -credential $credential -query $query_blocks  
+        $result_mdl = MySQLPerfChecker -mysqlHost $mysqlHost -credential $credential -query $query_mdl  
+        $result_concurrent_ticket = MySQLPerfChecker -mysqlHost $mysqlHost -credential $credential -query $query_concurrent_ticket  
+        $result_current_wait = MySQLPerfChecker -mysqlHost $mysqlHost -credential $credential -query $query_current_wait  
     
     
         #  Save each result in independent file
@@ -153,8 +145,6 @@ try {
         $result_current_wait | Export-Csv -Path $file_current_wait -NoTypeInformation  
     
         
-        
-        
     }
     catch {
         Write-Host
@@ -166,17 +156,22 @@ finally {
     if ($canWriteFiles) {
         Remove-Item ".\MySql.Data.dll" -Force
         Write-Host Log file can be found at (Get-Location).Path
-        if ($PSVersionTable.PSVersion.Major -ge 5) {
-            $destAllFiles = (Get-Location).Path + '/AllFiles.zip'
-            Compress-Archive -Path ((Get-Location).Path + '/*.csv'), ((Get-Location).Path + '/*.log') -DestinationPath $destAllFiles -Force
-            Write-Host 'A zip file with all the files can be found at' $destAllFiles -ForegroundColor Green
-
-              
-        }
-
-        # if ([System.Environment]::OSVersion.Platform -eq "Win32NT") {  
-        #     Start-Process $folderPath  
+        # if ($PSVersionTable.PSVersion.Major -ge 5) {
+        #     $destAllFiles = (Get-Location).Path + '/AllFiles.zip'
+        #     Compress-Archive -Path ((Get-Location).Path + '/*.csv'), ((Get-Location).Path + '/*.log') -DestinationPath $destAllFiles -Force
+        #     Write-Host 'A zip file with all the files can be found at' $destAllFiles -ForegroundColor Green
+        
         # }
+
+        Write-Host "=========================================================================================="
+        Write-Host $"Results were written to Temp directory."
+        Write-Host $"For Windows OS, the folder will be openned once logging completed."
+        Write-Host $"For Linux OS, please find the log files in path /tmp/AzureMySQLPerfCheckerResults."
+        Write-Host ""
+
+        if ([System.Environment]::OSVersion.Platform -eq "Win32NT") {  
+            Start-Process $folderPath  
+        }
 
         if ($PSVersionTable.Platform -eq 'Unix') {
             
