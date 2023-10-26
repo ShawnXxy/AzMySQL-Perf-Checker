@@ -4,7 +4,6 @@
 #FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 #WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 $RepositoryBranch = 'master'
 
 $CustomerRunningInElevatedMode = $false
@@ -19,7 +18,37 @@ else {
         $CustomerRunningInElevatedMode = $true
     }
 }
+  
+function Test-MySQLConnection {  
+    param(  
+        [string]$mysqlHost,  
+        [System.Management.Automation.PSCredential]$credential  
+    )  
+  
+    $username = $credential.UserName  
+    $password = $credential.GetNetworkCredential().Password  
+  
+    $connectionString = "Server=$mysqlHost;Uid=$username;Pwd=$password;"  
+  
+    $connection = New-Object MySql.Data.MySqlClient.MySqlConnection($connectionString)  
+    try {  
+        $connection.Open()  
+        if ($connection.State -ne 'Open') {  
+            throw "Failed to connect to MySQL Server"  
+        }  
+    }  
+    catch {  
+        Write-Error "An error occurred: $($_.Exception.Message)"  
+        Write-Host 
+        Write-Host "Please double check the connection string and confirm network/firewall settings." -ForegroundColor Yellow
+        Write-Host "You can leverage https://github.com/ShawnXxy/AzMySQL-Connectivity-Checker to further examine connectivity." 
 
+        exit  
+    }  
+    finally {  
+        $connection.Close()  
+    }  
+}  
 function ExecuteMyQuery {  
     param(  
         [string]$mysqlHost,  
@@ -75,8 +104,11 @@ if ($null -eq $credential.GetNetworkCredential().Password) {
     exit  
 }  
 
+# Test connection before running queries  
+Test-MySQLConnection -mysqlHost $mysqlHost -credential $credential  
+
 # Perf Query to be run
-$query_processlist = "SHOW FULL PROCESSLIST;"
+$query_processlist = "SELECT * FROM information_schema.processlist Order by TIME DESC;"
 $query_innodb_status = "SHOW ENGINE INNODB STATUS;"
 
 $serverVersionResult  = ExecuteMyQuery -mysqlHost $mysqlHost -credential $credential -query "SELECT VERSION();"
@@ -124,7 +156,7 @@ try {
     }
     catch {
         $canWriteFiles = $false
-        Write-Host Warning: Cannot write log file -ForegroundColor Yellow
+        Write-Host "Warning: Cannot write log file." -ForegroundColor Yellow
     }
 
     try {
@@ -135,7 +167,6 @@ try {
         $result_concurrent_ticket = ExecuteMyQuery -mysqlHost $mysqlHost -credential $credential -query $query_concurrent_ticket  
         $result_current_wait = ExecuteMyQuery -mysqlHost $mysqlHost -credential $credential -query $query_current_wait  
     
-    
         #  Save each result in independent file
         $file_processlist = Join-Path $folderPath "processlist.csv"  
         $file_innodb_status = Join-Path $folderPath "innodb_status.log"  
@@ -144,7 +175,6 @@ try {
         $file_mdl = Join-Path $folderPath "mdl.csv"  
         $file_concurrent_ticket = Join-Path $folderPath "concurrent_ticket.csv"  
     
-        
         $result_processlist | Export-Csv -Path $file_processlist -NoTypeInformation  
         $result_innodb_status | Export-Csv -Path $file_innodb_status -NoTypeInformation  
         $result_blocks | Export-Csv -Path $file_blocks -NoTypeInformation  
@@ -173,16 +203,13 @@ try {
             else {
                 Invoke-Item (Get-Location).Path
             }
-        
         }
-        
     }
     catch {
         Write-Host
         Write-Host 'Script Execution Terminated Due to Exceptions' -ForegroundColor Yellow
         Write-Host 'No logs are saved' -ForegroundColor Yellow
     }
-    
 } 
 catch {
     Write-Host
