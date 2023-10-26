@@ -20,7 +20,7 @@ else {
     }
 }
 
-function MySQLPerfChecker {  
+function ExecuteMyQuery {  
     param(  
         [string]$mysqlHost,  
         [System.Management.Automation.PSCredential]$credential,  
@@ -78,17 +78,25 @@ if ($null -eq $credential.GetNetworkCredential().Password) {
 # Perf Query to be run
 $query_processlist = "SHOW FULL PROCESSLIST;"
 $query_innodb_status = "SHOW ENGINE INNODB STATUS;"
-# innodb_lock_waits only exists in MySQL 5.7
-$query_blocks = "SELECT r.trx_mysql_thread_id waiting_thread, r.trx_query waiting_query, concat(timestampdiff(SECOND, r.trx_wait_started, CURRENT_TIMESTAMP()), 's') AS duration, b.trx_mysql_thread_id blocking_thread, t.processlist_command state, b.trx_query blocking_current_query, e.sql_text blocking_last_query FROM information_schema.innodb_lock_waits w JOIN information_schema.innodb_trx b ON b.trx_id = w.blocking_trx_id JOIN information_schema.innodb_trx r ON r.trx_id = w.requesting_trx_id JOIN performance_schema.threads t on t.processlist_id = b.trx_mysql_thread_id JOIN performance_schema.events_statements_current e USING(thread_id); "
+
+$serverVersionResult  = ExecuteMyQuery -mysqlHost $mysqlHost -credential $credential -query "SELECT VERSION();"
+$query_blocks = @()
+if ($serverVersionResult[0].'VERSION()'.StartsWith("8.")) {
+    # for version 8+
+    $query_blocks = "SELECT r.trx_id waiting_trx_id, r.trx_mysql_thread_id waiting_thread, r.trx_query waiting_query, b.trx_id blocking_trx_id, b.trx_mysql_thread_id blocking_thread,  b.trx_query blocking_query FROM  performance_schema.data_lock_waits w INNER JOIN      information_schema.innodb_trx b ON  b.trx_id = w.BLOCKING_ENGINE_TRANSACTION_ID INNER JOIN  information_schema.innodb_trx r ON  r.trx_id = w.REQUESTING_ENGINE_TRANSACTION_ID;"
+} else {
+    # innodb_lock_waits only exists in MySQL 5.7
+    $query_blocks = "SELECT r.trx_mysql_thread_id waiting_thread, r.trx_query waiting_query, concat(timestampdiff(SECOND, r.trx_wait_started, CURRENT_TIMESTAMP()), 's') AS duration, b.trx_mysql_thread_id blocking_thread, t.processlist_command state, b.trx_query blocking_current_query, e.sql_text blocking_last_query FROM information_schema.innodb_lock_waits w JOIN information_schema.innodb_trx b ON b.trx_id = w.blocking_trx_id JOIN information_schema.innodb_trx r ON r.trx_id = w.requesting_trx_id JOIN performance_schema.threads t on t.processlist_id = b.trx_mysql_thread_id JOIN performance_schema.events_statements_current e USING(thread_id); "
+}
+
 $query_mdl = "SELECT OBJECT_TYPE, OBJECT_SCHEMA, OBJECT_NAME, LOCK_TYPE, LOCK_STATUS, THREAD_ID, PROCESSLIST_ID, PROCESSLIST_INFO FROM performance_schema.metadata_locks INNER JOIN performance_schema.threads ON THREAD_ID = OWNER_THREAD_ID WHERE PROCESSLIST_ID<> CONNECTION_ID(); "
 $query_concurrent_ticket = "SELECT OBJECT_TYPE, OBJECT_SCHEMA, OBJECT_NAME, LOCK_TYPE, LOCK_STATUS, THREAD_ID, PROCESSLIST_ID, PROCESSLIST_INFO FROM performance_schema.metadata_locks INNER JOIN performance_schema.threads ON THREAD_ID = OWNER_THREAD_ID WHERE PROCESSLIST_ID<> CONNECTION_ID(); "
 $query_current_wait = "select sys.format_time(SuM(TIMER_WAIT)) as TIMER_WAIT_SEC, sys.format_bytes(SUM(NUMBER_OF_BYTES)) as NUMBER_OF_BYTES, EVENT_NAME, OPERATION from performance_schema.events_waits_current where EVENT_NAME != 'idle' group by EVENT_NAME,OPERATION order by TIMER_WAIT_SEC desc; "
   
 try {
-    Clear-Host
     $canWriteFiles = $true
     try {
-        $logsFolderName = 'AzureMySQLPerfCheckerResults'
+        $logsFolderName = 'AzureExecuteMyQueryResults'
         Set-Location -Path $env:TEMP
         If (!(Test-Path $logsFolderName)) {
             New-Item $logsFolderName -ItemType directory | Out-Null
@@ -120,12 +128,12 @@ try {
     }
 
     try {
-        $result_processlist = MySQLPerfChecker -mysqlHost $mysqlHost -credential $credential -query $query_processlist  
-        $result_innodb_status = MySQLPerfChecker -mysqlHost $mysqlHost -credential $credential -query $query_innodb_status  
-        $result_blocks = MySQLPerfChecker -mysqlHost $mysqlHost -credential $credential -query $query_blocks  
-        $result_mdl = MySQLPerfChecker -mysqlHost $mysqlHost -credential $credential -query $query_mdl  
-        $result_concurrent_ticket = MySQLPerfChecker -mysqlHost $mysqlHost -credential $credential -query $query_concurrent_ticket  
-        $result_current_wait = MySQLPerfChecker -mysqlHost $mysqlHost -credential $credential -query $query_current_wait  
+        $result_processlist = ExecuteMyQuery -mysqlHost $mysqlHost -credential $credential -query $query_processlist 
+        $result_innodb_status = ExecuteMyQuery -mysqlHost $mysqlHost -credential $credential -query $query_innodb_status  
+        $result_blocks = ExecuteMyQuery -mysqlHost $mysqlHost -credential $credential -query $query_blocks  
+        $result_mdl = ExecuteMyQuery -mysqlHost $mysqlHost -credential $credential -query $query_mdl  
+        $result_concurrent_ticket = ExecuteMyQuery -mysqlHost $mysqlHost -credential $credential -query $query_concurrent_ticket  
+        $result_current_wait = ExecuteMyQuery -mysqlHost $mysqlHost -credential $credential -query $query_current_wait  
     
     
         #  Save each result in independent file
@@ -144,46 +152,43 @@ try {
         $result_concurrent_ticket | Export-Csv -Path $file_concurrent_ticket -NoTypeInformation  
         $result_current_wait | Export-Csv -Path $file_current_wait -NoTypeInformation  
     
+        if ($canWriteFiles) {
+            Remove-Item ".\MySql.Data.dll" -Force
+            Write-Host Log file can be found at (Get-Location).Path
+
+            Write-Host "=========================================================================================="
+            Write-Host $"Results were written to Temp directory."
+            Write-Host $"For Windows OS, the folder will be openned once logging completed."
+            Write-Host $"For Linux OS, please find the log files in path /tmp/AzureExecuteMyQueryResults."
+            Write-Host ""
+
+            if ([System.Environment]::OSVersion.Platform -eq "Win32NT") {  
+                Start-Process $folderPath  
+            }
+
+            if ($PSVersionTable.Platform -eq 'Unix') {
+                
+                Get-ChildItem
+            }
+            else {
+                Invoke-Item (Get-Location).Path
+            }
+        
+        }
         
     }
     catch {
         Write-Host
         Write-Host 'Script Execution Terminated Due to Exceptions' -ForegroundColor Yellow
+        Write-Host 'No logs are saved' -ForegroundColor Yellow
     }
     
+} 
+catch {
+    Write-Host
+    Write-Host 'Something goes wrong...' -ForegroundColor Yellow
 }
-finally {
-    if ($canWriteFiles) {
-        Remove-Item ".\MySql.Data.dll" -Force
-        Write-Host Log file can be found at (Get-Location).Path
-        # if ($PSVersionTable.PSVersion.Major -ge 5) {
-        #     $destAllFiles = (Get-Location).Path + '/AllFiles.zip'
-        #     Compress-Archive -Path ((Get-Location).Path + '/*.csv'), ((Get-Location).Path + '/*.log') -DestinationPath $destAllFiles -Force
-        #     Write-Host 'A zip file with all the files can be found at' $destAllFiles -ForegroundColor Green
-        
-        # }
 
-        Write-Host "=========================================================================================="
-        Write-Host $"Results were written to Temp directory."
-        Write-Host $"For Windows OS, the folder will be openned once logging completed."
-        Write-Host $"For Linux OS, please find the log files in path /tmp/AzureMySQLPerfCheckerResults."
-        Write-Host ""
-
-        if ([System.Environment]::OSVersion.Platform -eq "Win32NT") {  
-            Start-Process $folderPath  
-        }
-
-        if ($PSVersionTable.Platform -eq 'Unix') {
-            
-            Get-ChildItem
-        }
-        else {
-            Invoke-Item (Get-Location).Path
-        }
-
-       
-    }
-}
 
 
 

@@ -51,9 +51,6 @@ catch {
 #end of script
 ```
 
-## Limitation
-Currently, only supports MySQL 5.7 as some dictionay table changed in MySQL 8.0
-
 >Disclaimer: This sample code is available AS IS with no warranties and support from Microsoft. Please raise an issue in Github if you encounter any issues and I will try our best to address it.
 
 

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "07fqUzax2dR977x94lrGrvHWjaypAXHFuSPabD41s2BkzaHr3lrfp76evD4D1YyX+9ipbNaXxbrtaOexK0ucNg==",
+  "dgSpecHash": "lVtCtDRqFSZCo0JMz+o+xggURiHZ+LQ++IT2tVucvmiMndq09GomfV8Q9C6oITBJu1yJX7APpawiJ+hpxjZGcA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\xixia\\Orcas\\AzMy-Perf-Checker\\AzMy-Perf-Checker.csproj",
+  "projectFilePath": "C:\\Users\\xixia\\Orcas\\AzMySQL-Perf-Checker\\AzMy-Perf-Checker.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\xixia\\.nuget\\packages\\google.protobuf\\3.21.9\\google.protobuf.3.21.9.nupkg.sha512",
     "C:\\Users\\xixia\\.nuget\\packages\\k4os.compression.lz4\\1.3.5\\k4os.compression.lz4.1.3.5.nupkg.sha512",
