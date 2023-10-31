@@ -147,7 +147,7 @@ try {
             Copy-Item -Path $($LocalPath + '/lib/MySql.Data.dll') -Destination $MySQLDllPath
         }
         else {
-            #ShawnXxy/AzMySQL-Connectivity-Checker
+            #ShawnXxy/AzMySQL-Perf-Checker
             Invoke-WebRequest -Uri $('https://github.com/ShawnXxy/AzMySQL-Perf-Checker/raw/' + $RepositoryBranch + '/lib/MySql.Data.dll') -OutFile $MySQLDllPath -UseBasicParsing
         }
         $assembly = [System.IO.File]::ReadAllBytes($MySQLDllPath)
