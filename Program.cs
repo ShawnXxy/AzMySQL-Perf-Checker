@@ -28,10 +28,18 @@ class Program
         {
             try
             {
-                await connection.OpenAsync();
+                Console.WriteLine("");
+                Console.WriteLine("Start to test connecivity to target MySQL!");
 
+                await connection.OpenAsync();
+                                
                 if (connection.State == System.Data.ConnectionState.Open)
                 {
+                    
+                    Console.WriteLine($"Connection made to {host} is successful.\n");
+                    Console.WriteLine("Starting to collect performance status... \n");
+                    Console.WriteLine("");
+
                     // Perf Query to be run
                     string query_processlist = "SELECT * FROM information_schema.processlist Order by TIME DESC;";
                     string query_innodb_status = "SHOW ENGINE INNODB STATUS;";
@@ -41,7 +49,7 @@ class Program
                     if (serverVersion.StartsWith("8."))
                     {
                         // for version 8+
-                        query_blocks = "SELECT r.trx_id waiting_trx_id, r.trx_mysql_thread_id waiting_thread, r.trx_query waiting_query, b.trx_id blocking_trx_id, b.trx_mysql_thread_id blocking_thread,  b.trx_query blocking_query FROM  performance_schema.data_lock_waits w INNER JOIN      information_schema.innodb_trx b ON  b.trx_id = w.BLOCKING_ENGINE_TRANSACTION_ID INNER JOIN  information_schema.innodb_trx r ON  r.trx_id = w.REQUESTING_ENGINE_TRANSACTION_ID;";
+                        query_blocks = "SELECT r.trx_id waiting_trx_id, r.trx_mysql_thread_id waiting_thread, r.trx_query waiting_query, b.trx_id blocking_trx_id, b.trx_mysql_thread_id blocking_thread,  b.trx_query blocking_query FROM  performance_schema.data_lock_waits w INNER JOIN information_schema.innodb_trx b ON  b.trx_id = w.BLOCKING_ENGINE_TRANSACTION_ID INNER JOIN  information_schema.innodb_trx r ON  r.trx_id = w.REQUESTING_ENGINE_TRANSACTION_ID;";
                     }
                     else
                     {
@@ -64,36 +72,62 @@ class Program
                     Console.WriteLine("SHOW PROCESSLIST Result:");
                     Console.WriteLine("========================");
                     Console.WriteLine(result_processlist);
-
                     Console.WriteLine("");
+                    string summary_processlist = await AskGPT.GetResponse(result_processlist);
+                    Console.WriteLine("Summary of processlist:\n");
+                    Console.WriteLine(summary_processlist);
+                    Console.WriteLine("");
+
                     Console.WriteLine("=================================");
                     Console.WriteLine("SHOW ENGINE INNODB STATUS Result:");
                     Console.WriteLine("=================================");
                     Console.WriteLine(result_innodb_status);
+                    Console.WriteLine("");
+                    string summary_innodb_status = await AskGPT.GetResponse(result_innodb_status);
+                    Console.WriteLine("Summary of InnoDB Status:\n");
+                    Console.WriteLine(summary_innodb_status);
+                    Console.WriteLine("");
 
                     Console.WriteLine("");
                     Console.WriteLine("==============================");
                     Console.WriteLine("SHOW CURRENT BLOCKINGS Result:");
                     Console.WriteLine("==============================");
                     Console.WriteLine(result_blocks);
+                    Console.WriteLine("");
+                    string summary_blocks = await AskGPT.GetResponse(result_blocks);
+                    Console.WriteLine("Summary of InnoDB Status:\n");
+                    Console.WriteLine(summary_blocks);
+                    Console.WriteLine("");
 
                     Console.WriteLine("");
                     Console.WriteLine("===================================");
                     Console.WriteLine("SHOW CURRENT WAITING EVENTS Result:");
                     Console.WriteLine("===================================");
                     Console.WriteLine(result_current_wait);
+                    Console.WriteLine("");
+                    string summary_current_wait = await AskGPT.GetResponse(result_current_wait);
+                    Console.WriteLine("Summary of current wait events:\n");
+                    Console.WriteLine(summary_current_wait);
 
                     Console.WriteLine("");
                     Console.WriteLine("========================");
                     Console.WriteLine("SHOW CURRENT MDL Result:");
                     Console.WriteLine("========================");
                     Console.WriteLine(result_mdl);
+                    Console.WriteLine("");
+                    string summary_mdl = await AskGPT.GetResponse(result_mdl);
+                    Console.WriteLine("Summary of InnoDB Status:\n");
+                    Console.WriteLine(summary_mdl);
 
                     Console.WriteLine("");
                     Console.WriteLine("===============================");
                     Console.WriteLine("SHOW CONCURRENT TICKETS Result:");
                     Console.WriteLine("===============================");
                     Console.WriteLine(result_concurrent_ticket);
+                    Console.WriteLine("");
+                    string summary_concurrent_ticket = await AskGPT.GetResponse(result_concurrent_ticket);
+                    Console.WriteLine("Summary of InnoDB Status:\n");
+                    Console.WriteLine(summary_concurrent_ticket);
 
                     // Create folder in Temp directory and subfolder named based on UTC timestamp
                     string folderPath = Path.Combine(Path.GetTempPath(), "AzureMySQLPerfCheckerResults", $"{DateTime.UtcNow:yyyyMMddHHmmss}");
@@ -114,11 +148,12 @@ class Program
                     await File.WriteAllTextAsync(file_current_wait, result_current_wait);
                     await File.WriteAllTextAsync(file_concurrent_ticket, result_concurrent_ticket);
 
+                    Console.WriteLine("");
                     Console.WriteLine("==========================================================================================");
                     Console.WriteLine($"Results were written to Temp directory.");
                     Console.WriteLine($"For Windows OS, the folder will be openned once logging completed.");
                     Console.WriteLine($"For Linux OS, please find the log files in path /tmp/AzureMySQLPerfCheckerResults.");
-                    Console.WriteLine("");
+                    
 
                     // Open folder once completed (in WinOS)
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

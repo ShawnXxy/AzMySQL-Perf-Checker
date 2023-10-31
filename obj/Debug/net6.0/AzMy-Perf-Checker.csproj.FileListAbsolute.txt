@@ -86,3 +86,7 @@ C:\Users\xixia\Orcas\AzMySQL-Perf-Checker\bin\Debug\net6.0\runtimes\win\lib\netc
 C:\Users\xixia\Orcas\AzMySQL-Perf-Checker\obj\Debug\net6.0\AzMy-Perf-Checker.csproj.CopyComplete
 C:\Users\xixia\Orcas\AzMySQL-Perf-Checker\obj\Debug\net6.0\AzMy-Perf-Checker.genruntimeconfig.cache
 C:\Users\xixia\Orcas\AzMySQL-Perf-Checker\obj\Debug\net6.0\ref\AzMy-Perf-Checker.dll
+C:\Users\xixia\Orcas\AzMySQL-Perf-Checker\bin\Debug\net6.0\Azure.AI.OpenAI.dll
+C:\Users\xixia\Orcas\AzMySQL-Perf-Checker\bin\Debug\net6.0\Azure.Core.dll
+C:\Users\xixia\Orcas\AzMySQL-Perf-Checker\bin\Debug\net6.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\xixia\Orcas\AzMySQL-Perf-Checker\bin\Debug\net6.0\System.Memory.Data.dll
