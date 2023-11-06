@@ -314,7 +314,7 @@ $query_table_buffer = "Select * from sys.schema_table_statistics_with_buffer;"
 try {
     $canWriteFiles = $true
     try {
-        $logsFolderName = 'AzureExecuteMyQueryResults'
+        $logsFolderName = 'AzureMySQLPerfCheckerResults'
         Set-Location -Path $env:TEMP
         If (!(Test-Path $logsFolderName)) {
             New-Item $logsFolderName -ItemType directory | Out-Null
