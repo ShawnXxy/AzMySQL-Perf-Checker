@@ -38,7 +38,6 @@ Write-Host 'Trying to download the script file from GitHub (https://github.com/S
 Write-Host "Source file address:" $scriptUrlBase$scriptFile
 try {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls
-    [System.Reflection.Assembly]::LoadWithPartialName("MySql.Data")
     Invoke-Expression (Invoke-WebRequest -Uri ($scriptUrlBase + $scriptFile) -UseBasicParsing).Content
     }
 catch {

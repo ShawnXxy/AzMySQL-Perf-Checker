@@ -1,3 +1,6 @@
+using namespace System
+using namespace MySql.Data.MySqlClient
+
 $RepositoryBranch = 'master'
 
 $CustomerRunningInElevatedMode = $false
@@ -24,14 +27,15 @@ function Test-MySQLConnection {
   
     $connectionString = "Server=$mysqlHost;Uid=$username;Pwd=$password;"  
   
-    $connection = New-Object MySql.Data.MySqlClient.MySqlConnection($connectionString)  
+    # $connection = New-Object MySql.Data.MySqlClient.MySqlConnection($connectionString)  
+    $connection = [MySql.Data.MySqlClient.MySqlConnection]@{connectionString = $connectionString}
     try {  
         $connection.Open()  
         if ($connection.State -ne 'Open') {  
             throw "Failed to connect to MySQL Server"  
         }  
     }  
-    catch {  
+    catch  [MySql.Data.MySqlClient.MySqlException] {  
         Write-Error "An error occurred: $($_.Exception.Message)"  
         Write-Host 
         Write-Host "Please double check the connection string and confirm network/firewall settings." -ForegroundColor Yellow
