@@ -1,5 +1,4 @@
-﻿[System.Reflection.Assembly]::LoadWithPartialName("MySql.Data")
-
+﻿
 $RepositoryBranch = 'master'
 
 $CustomerRunningInElevatedMode = $false
@@ -381,7 +380,7 @@ try {
         
     
         if ($canWriteFiles) {
-            Remove-Item ".\MySql.Data.dll" -Force
+            
             Write-Host Log file can be found at (Get-Location).Path
 
             Write-Host "=========================================================================================="
@@ -401,6 +400,8 @@ try {
             else {
                 Invoke-Item (Get-Location).Path
             }
+
+            Remove-Item ".\MySql.Data.dll" -Force
         }
     }
     catch {
