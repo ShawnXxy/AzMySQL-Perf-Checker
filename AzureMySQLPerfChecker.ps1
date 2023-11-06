@@ -1,4 +1,3 @@
-﻿
 $RepositoryBranch = 'master'
 
 $CustomerRunningInElevatedMode = $false
