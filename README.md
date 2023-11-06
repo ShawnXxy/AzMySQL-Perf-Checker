@@ -51,6 +51,9 @@ catch {
 #end of script
 ```
 
+## Limitations:
+Due to the API limitaiton, if you selected to run in a PowerShell mode, Azure OpenAI would not be able to run analyze the output. 
+
 >Disclaimer: This sample code is available AS IS with no warranties and support from Microsoft. Please raise an issue in Github if you encounter any issues and I will try our best to address it.
 
 
