@@ -18,15 +18,6 @@ sudo apt-get install dotnet-sdk-6.0
 
 
 ## Detail usage instructions:
-**LINUX** <br>
-Checkout the sample code and run :
-```bash
-git clone https://github.com/ShawnXxy/AzMySQL-Perf-Checker.git
-cd AzMySQL-Perf-Checker
-dotnet build
-sudo dotnet run
-```
-
 **Windows** <br>
 Paste the following in a Powershell console in Windows:
 ```powershell
@@ -50,8 +41,24 @@ catch {
 #end of script
 ```
 
-## Limitations:
-Due to the API limitaiton, if you selected to run in a PowerShell mode, Azure OpenAI would not be able to run analyze the output. 
+**LINUX** <br>
+Checkout the sample code and run :
+```bash
+git clone https://github.com/ShawnXxy/AzMySQL-Perf-Checker.git
+cd AzMySQL-Perf-Checker
+dotnet build
+sudo dotnet run
+```
+
+If you prefer to run in PowwerShell mode on a Linux machine, 
+In order to run this script on Linux you need to 
+1. Installing PowerShell on Linux (if you haven't before).
+   See how to get the packages at https://docs.microsoft.com/powershell/scripting/install/installing-powershell-core-on-linux
+
+2. In Linux commandline, run `pwsh` from a Linux terminal to start a powershell terminal. 
+
+3. Copy and paste the script  to the powershell terminal started in above from above `Windows` section.
+
 
 >Disclaimer: This sample code is available AS IS with no warranties and support from Microsoft. Please raise an issue in Github if you encounter any issues and I will try our best to address it.
 
