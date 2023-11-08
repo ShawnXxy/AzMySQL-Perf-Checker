@@ -1,7 +1,16 @@
 # AzMySQL-Perf-Checker
 This is a console app that will 
 1. connect to a MySQL server based on the host and username user provided 
-1. query detailed metadata from `information_schema` and/or `performance_schema` to get result of MySQL runtime status and performance details like InnoDB status, wait events, blocking chains, etc.
+1. query detailed metadata from `information_schema` and/or `performance_schema` to get result of MySQL runtime status and performance details like 
+    - Processlist
+    - InnoDB Status
+    - Blocking events
+    - MDL
+    - Wait events
+    - Full table scan queries
+    - File-sort queriies
+    - tmp table queries
+    - heavy file IO
 1. save result into a temp directory for later analysis. Subfoldes wll be organized based on execution timestamp (UTC)
 
 ## Prerequisite
