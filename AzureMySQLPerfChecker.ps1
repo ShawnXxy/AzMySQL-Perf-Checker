@@ -493,14 +493,14 @@ try {
         $summary_stmt_tmptables = $disclamer_ai_access
         if ($allowAzOpenAI) {
             Write-Host "Since you selected Y to allow Azure OpenAI to analyze the output, please wait for a few minutes for the auto-analysis to complete."
-            $summary_processlist = Get-OutputAnalysis -output ($result_processlist | Format-Table | Out-String)
-            $summary_innodb_status = Get-OutputAnalysis -output ($result_innodb_status | Format-Table | Out-String)
-            $summary_blocks = Get-OutputAnalysis -output ($result_blocks | Format-Table | Out-String)
-            $summary_mdl = Get-OutputAnalysis -output ($result_mdl | Format-Table | Out-String)
-            $summary_current_wait = Get-OutputAnalysis -output ($result_current_wait | Format-Table | Out-String)
-            $summary_stmt_fulltablescan = Get-OutputAnalysis -output ($result_stmt_fulltablescan | Format-Table | Out-String)
-            $summary_stmt_filesort = Get-OutputAnalysis -output ($result_stmt_filesort | Format-Table | Out-String)
-            $summary_stmt_tmptables = Get-OutputAnalysis -output ($result_stmt_tmptables | Format-Table | Out-String)  
+            $summary_processlist = Get-OutputAnalysis -output ($result_processlist | Out-String)
+            $summary_innodb_status = Get-OutputAnalysis -output $result_innodb_status
+            $summary_blocks = Get-OutputAnalysis -output ($result_blocks | Out-String)
+            $summary_mdl = Get-OutputAnalysis -output ($result_mdl | Out-String)
+            $summary_current_wait = Get-OutputAnalysis -output ($result_current_wait  | Out-String)
+            $summary_stmt_fulltablescan = Get-OutputAnalysis -output ($result_stmt_fulltablescan | Out-String)
+            $summary_stmt_filesort = Get-OutputAnalysis -output ($result_stmt_filesort | Out-String)
+            $summary_stmt_tmptables = Get-OutputAnalysis -output ($result_stmt_tmptables  | Out-String)  
         } 
         Write-Host
 
