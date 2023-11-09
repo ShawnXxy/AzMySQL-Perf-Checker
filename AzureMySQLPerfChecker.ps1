@@ -96,7 +96,7 @@ function ExecuteMyQuery {
         }  
 
         if ($result.length -eq 0) {
-            $result = @("no data returned")
+            $result = @(" ")
         }
 
         $result  
@@ -169,7 +169,7 @@ function Get-OutputAnalysis {
     $frequency_penalty = 0  
     $presence_penalty = 0  
   
-    $prompt = "Below is an output returned from MySQL system table used to analyze MySQL performance status. Please intepret and summarize the output. Instruction: 1-Highlight the key information of the output from an experienced MySQL DBA prospect; 2-highlight the potential performance impact based on the data returned in the ouput; 3-gave professional suggestions based on the highlight; 3-if no data output, please respond no data returned; 4-if too many rows returned in the output, summarize only based on the top 10 rows.[start of Output]" + $output + "[end of Output]"  
+    $prompt = "Below is an output returned from MySQL system table used to analyze MySQL performance status. Please intepret and summarize the output from an experienced MySQL DBA prospect following below instructions: 1-Highlight the key information of the output; 2-highlight the potential performance impact based on the data returned in the ouput; 3-gave professional suggestions; 3-if no data output returned or passed in, please ignore above instructions and respond no data returned.[start of Output]" + $output + "[end of Output]"  
   
     $chatCompletions = @{  
         "prompt"            = $prompt  
@@ -248,7 +248,9 @@ try {
             exit  
         }  
 
-
+        Write-Host "Please select below option cautiously:" -ForegroundColor Yellow
+        Write-Host "    - if you select 'Y', meaning you willaAllow Azure OpenAI to analyze the output and provide auto-analysis. Please note, ONLY returned output will be used for Azure OpenAI analysis." -ForegroundColor Yellow
+        Write-Host "    - if you select 'N' or any other answers(leave it blank), meaning you will NOT allow Azure OpenAI to analyze the output and provide auto-analysis. The output will be saved in the log file but no auto-analysis will be provided." -ForegroundColor Yellow
         $allowAzOpenAI = Read-Host "Allow Azure OpenAI to analyze the output? (Y/N)"
         if ($allowAzOpenAI -eq "Y") {
             $allowAzOpenAI = $true
