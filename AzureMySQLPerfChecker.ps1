@@ -1,7 +1,14 @@
 using namespace System
 using namespace MySql.Data.MySqlClient
 
-$RepositoryBranch = 'master'
+
+if ($null -eq $Local) {
+    $Local = $false
+}
+
+if ($null -eq $RepositoryBranch) {
+    $RepositoryBranch = 'master'
+}
 
 $summaryLog = New-Object -TypeName "System.Text.StringBuilder"
 
