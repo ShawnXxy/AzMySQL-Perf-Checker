@@ -648,7 +648,8 @@ try {
             Write-Host
             Write-Host "#################################################################################"
             Write-Host Log file can be found at (Get-Location).Path
-            Write-Host $"For Windows OS, the folder will be openned once logging completed."
+            Write-Host "If you are running in a Windows OS, the folder will be openned once logging completed."
+            Write-Host "If you are running in a Linux OS, the path should be listed as below once logging completed."
             Write-Host 
 
             if ([System.Environment]::OSVersion.Platform -eq "Win32NT") {  
