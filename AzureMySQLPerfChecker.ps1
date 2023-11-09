@@ -234,7 +234,20 @@ try {
         Write-Host '*   Azure MySQL Performance Checker v1.0   *' -ForegroundColor Green
         Write-Host '********************************************' -ForegroundColor Green
         Write-Host
-        
+        Write-Host "This script can be usefule to capture live metadata from MySQL server for performance troubleshooting." -ForegroundColor Yellow
+        Write-Host 'This script will collect below information after connection established to your MySQL:' -ForegroundColor Yellow
+        Write-Host '    - processlist' -ForegroundColor Yellow
+        Write-Host '    - innodb status' -ForegroundColor Yellow
+        Write-Host '    - blocking events' -ForegroundColor Yellow
+        Write-Host '    - metadata locks' -ForegroundColor Yellow
+        Write-Host '    - waiting events' -ForegroundColor Yellow
+        Write-Host '    - SQL statement with full table scan' -ForegroundColor Yellow
+        Write-Host '    - SQL statement with file-sort' -ForegroundColor Yellow
+        Write-Host '    - SQL statement with tmp tables' -ForegroundColor Yellow   
+        Write-Host '    - file io usage' -ForegroundColor Yellow
+        Write-Host '    - table data in buffer pool' -ForegroundColor Yellow
+        Write-Host
+
         $mysqlHost = Read-Host "Enter MySQL host"  
         $credential = Get-Credential -Message "Enter MySQL username and password"  
         
@@ -507,7 +520,7 @@ try {
         $sqlExplain_processlist = Get-SqlExplanation -query $query_processlist
         Write-Host "#################################################################################"
         Write-Host "Start to print processlist result. " -ForegroundColor Yellow
-        Write-Host $sqlExplain_processlist
+        Write-Host $sqlExplain_processlist -ForegroundColor Gray
         Write-Host "Please wait..." -ForegroundColor Yellow
         Write-Host "#################################################################################"
         Write-Host ($result_processlist | Format-Table | Out-String)
@@ -519,7 +532,7 @@ try {
         $sqlExplain_innodb_status = Get-SqlExplanation -query $query_innodb_status
         Write-Host "#################################################################################"
         Write-Host "Start to print InnoDB Status." -ForegroundColor Yellow
-        Write-Host $sqlExplain_innodb_status
+        Write-Host $sqlExplain_innodb_status -ForegroundColor Gray
         Write-Host "Please wait..." -ForegroundColor Yellow
         Write-Host "#################################################################################"
         Write-Host $result_innodb_status
@@ -531,7 +544,7 @@ try {
         $sqlExplain_blocks = Get-SqlExplanation -query $query_blocks
         Write-Host "#################################################################################"
         Write-Host "Start to collect current blockings." -ForegroundColor Yellow
-        Write-Host $sqlExplain_blocks
+        Write-Host $sqlExplain_blocks -ForegroundColor Gray
         Write-Host "Please wait..." -ForegroundColor Yellow
         Write-Host "#################################################################################"
         Write-Host ($result_blocks | Format-Table | Out-String)
@@ -543,7 +556,7 @@ try {
         $sqlExplain_mdl = Get-SqlExplanation -query $query_mdl
         Write-Host "#################################################################################"
         Write-Host "Start to collect current MDL." -ForegroundColor Yellow
-        Write-Host $sqlExplain_mdl
+        Write-Host $sqlExplain_mdl -ForegroundColor Gray
         Write-Host "Please wait..." -ForegroundColor Yellow
         Write-Host "#################################################################################"
         Write-Host ($result_mdl | Format-Table | Out-String)
@@ -555,7 +568,7 @@ try {
         $sqlExplain_current_wait = Get-SqlExplanation -query $query_current_wait
         Write-Host "#################################################################################"
         Write-Host "Start to print current wait events. " -ForegroundColor YelloW     
-        Write-Host $sqlExplain_current_wait       
+        Write-Host $sqlExplain_current_wait  -ForegroundColor Gray     
         Write-Host "Please wait..." -ForegroundColor Yellow
         Write-Host "#################################################################################"
         Write-Host ($result_current_wait | Format-Table | Out-String)
@@ -567,7 +580,7 @@ try {
         $sqlExplain_stmt_fulltablescan = Get-SqlExplanation -query $query_stmt_fulltablescan
         Write-Host "#################################################################################"
         Write-Host "Start to print SQL statements with full-table-scan. " -ForegroundColor Yellow
-        Write-Host $sqlExplain_stmt_fulltablescan
+        Write-Host $sqlExplain_stmt_fulltablescan -ForegroundColor Gray
         Write-Host "Please wait..." -ForegroundColor Yellow
         Write-Host "#################################################################################"
         Write-Host ($result_stmt_fulltablescan | Format-Table | Out-String)
@@ -578,7 +591,7 @@ try {
         $sqlExplain_stmt_filesort = Get-SqlExplanation -query $query_stmt_filesort           
         Write-Host "#################################################################################"
         Write-Host "Start to print SQL statements with file-sort." -ForegroundColor Yellow
-        Write-Host $sqlExplain_stmt_filesort
+        Write-Host $sqlExplain_stmt_filesort -ForegroundColor Gray
         Write-Host "Please wait..." -ForegroundColor Yellow
         Write-Host "#################################################################################"
         Write-Host ($result_stmt_filesort | Format-Table | Out-String)
@@ -590,7 +603,7 @@ try {
         $sqlExplain_stmt_tmptables = Get-SqlExplanation -query $query_stmt_tmptables
         Write-Host "#################################################################################"
         Write-Host "Start to print SQL statements used temp tables. Please wait..." -ForegroundColor Yellow
-        Write-Host $sqlExplain_stmt_tmptables
+        Write-Host $sqlExplain_stmt_tmptables -ForegroundColor Gray
         Write-Host "Please wait..." -ForegroundColor Yellow
         Write-Host "#################################################################################"
         Write-Host ($result_stmt_tmptables | Format-Table | Out-String)
