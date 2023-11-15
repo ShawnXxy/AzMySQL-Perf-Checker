@@ -7,6 +7,7 @@ using MySql.Data.MySqlClient;
 using System.Threading.Tasks;
 using System.Security.Policy;
 using System.Threading;
+using System.ComponentModel;
 
 class Program
 {
@@ -15,6 +16,20 @@ class Program
         Console.WriteLine("**********************************************");
         Console.WriteLine("*    Azure MySQL Perfromance Checker V1.0    *");
         Console.WriteLine("**********************************************");
+        Console.WriteLine("This script can be usefule to capture live metadata from MySQL server for performance troubleshooting.");
+        Console.WriteLine("This script will collect below information after connection established to your MySQL:");
+        Console.WriteLine(" - processlist");
+        Console.WriteLine(" - innodb status");
+        Console.WriteLine(" - blocking events");
+        Console.WriteLine(" - metadata locks");
+        Console.WriteLine(" - waiting events");
+        Console.WriteLine(" - SQL statement with full table scan");
+        Console.WriteLine(" - SQL statement with file-sort");
+        Console.WriteLine(" - file io usage");
+        Console.WriteLine(" - table data in buffer pool");
+
+
+
 
         // Console Input
         Console.Write("Enter MySQL host: ");
@@ -26,6 +41,9 @@ class Program
         Console.Write("Enter MySQL password: ");
         SecureString password = GetPassword();
 
+        Console.Write("Please select below option cautiously:");
+        Console.Write("    - if you select 'Y', meaning you willaAllow Azure OpenAI to analyze the output and provide auto-analysis. Please note, ONLY returned output will be used for Azure OpenAI analysis.");
+        Console.Write("    - if you select 'N' or any other answers(leave it blank), meaning you will NOT allow Azure OpenAI to analyze the output and provide auto-analysis. The output will be saved in the log file but no auto-analysis will be provided.");
         Console.Write("Allow Azure OpenAI access to the result for auto analysis? (Y/N): ");
         string allowAIAccess = Console.ReadLine();
 
